@@ -1,0 +1,18 @@
+{
+  "entity": "ProductionOrder",
+  "version": "1.0.0",
+  "identity": { "key": "id", "label": "ProductionOrder" },
+  "sap": { "source_tables": ["AFKO"], "primary_field": "AUFNR" },
+  "properties": ["id", "plant_id", "product_id", "product_description", "planned_finish_date", "quantity", "status", "source_table"],
+  "relationships": {
+    "incoming": ["REQUIRED_FOR"],
+    "outgoing": ["RUNS_AT", "FULFILLS"]
+  },
+  "metrics": ["affected_deliveries", "affected_quantity", "revenue_exposure"],
+  "contexts": ["order_delay"],
+  "agent": {
+    "primary": "PlantImpactAgent",
+    "secondary": ["DeliveryRootCauseAgent"]
+  },
+  "security": { "classification": "internal" }
+}

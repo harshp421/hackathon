@@ -61,9 +61,9 @@ def _get_client():
     if _use_azure():
         # The Azure "/openai/v1/" surface rejects the api-version query param;
         # only the older /openai/deployments/... path uses it.
-        _client = OpenAI(base_url=_azure_base_url(), api_key=_AZ_KEY)
+        _client = OpenAI(base_url=_azure_base_url(), api_key=_AZ_KEY, timeout=12.0)
     else:
-        _client = OpenAI(api_key=_OA_KEY or None)
+        _client = OpenAI(api_key=_OA_KEY or None, timeout=12.0)
     return _client
 
 

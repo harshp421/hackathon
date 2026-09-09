@@ -1,0 +1,18 @@
+{
+  "entity": "Supplier",
+  "version": "1.0.0",
+  "identity": { "key": "id", "label": "Supplier" },
+  "sap": { "source_tables": ["LFA1"], "primary_field": "LIFNR" },
+  "properties": ["id", "name", "country", "delayed", "delay_reason", "source_table"],
+  "relationships": {
+    "incoming": [],
+    "outgoing": ["SUPPLIES"]
+  },
+  "metrics": ["affected_materials", "affected_plants", "affected_production_orders", "affected_deliveries", "revenue_exposure"],
+  "contexts": ["supplier_delay"],
+  "agent": {
+    "primary": "SupplierImpactAgent",
+    "secondary": ["MitigationAgent"]
+  },
+  "security": { "classification": "internal" }
+}
