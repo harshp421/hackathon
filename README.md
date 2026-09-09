@@ -39,8 +39,11 @@ python generate_demo_data.py          # already run — CSVs are in data/
 cp .env.example .env                   # then edit:
 #   NEO4J_URI=neo4j+s://xxxx.databases.neo4j.io
 #   NEO4J_PASSWORD=...
-#   OPENAI_API_KEY=sk-...              (optional — offline fallback works without it)
-#   OPENAI_MODEL=gpt-4o
+#   Azure OpenAI:  AZURE_OPENAI_ENDPOINT + AZURE_OPENAI_API_KEY + AZURE_OPENAI_DEPLOYMENT
+#   or plain OpenAI: OPENAI_API_KEY + OPENAI_MODEL
+#   (LLM is optional — offline regex/template fallback works without it)
+
+python llm.py                          # quick check: prints backend + a ping
 
 python load_graph.py                   # loads the graph  (add --wipe to reset first)
 streamlit run app.py                   # open the demo
