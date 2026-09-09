@@ -1,0 +1,7 @@
+supplier_id,name,country,delayed,delay_reason,source_table
+100234,Acme Fasteners GmbH,DE,TRUE,Customs hold at Hamburg port (est. 9 days),LFA1
+100567,Nordic Steel AB,SE,FALSE,,LFA1
+100812,Bavaria Precision Castings GmbH,DE,FALSE,,LFA1
+101245,Lyon Polymers SAS,FR,TRUE,Force majeure - flooding at Lyon plant (est. 5 days),LFA1
+101876,Iberian Bearings SL,ES,FALSE,,LFA1
+102455,Rhine Coatings GmbH,DE,FALSE,,LFA1

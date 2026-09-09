@@ -1,0 +1,5 @@
+plant_id,name,country,source_table
+1000,Stuttgart Gearbox Plant,DE,T001W
+2000,Hamburg Pump Plant,DE,T001W
+3000,Leipzig Machining Plant,DE,T001W
+4000,Munich Conveyor Plant,DE,T001W

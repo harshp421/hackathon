@@ -1,0 +1,17 @@
+{
+  "description": "Business ontology for the SAP Supply Chain Knowledge Graph POC. Phase 5 (NL -> params) and Phase 6 (params -> Cypher) both read this.",
+  "nodes": [
+    { "label": "Supplier",        "key": "id", "properties": ["id", "name", "country", "delayed", "delay_reason", "source_table"] },
+    { "label": "Material",         "key": "id", "properties": ["id", "description", "material_type", "base_unit", "procurement_type", "source_table"] },
+    { "label": "Plant",            "key": "id", "properties": ["id", "name", "country", "source_table"] },
+    { "label": "ProductionOrder",  "key": "id", "properties": ["id", "plant_id", "product_id", "product_description", "planned_finish_date", "quantity", "status", "source_table"] },
+    { "label": "Delivery",         "key": "id", "properties": ["id", "customer_id", "customer_name", "product_id", "quantity", "ship_date", "incoterms", "source_table"] }
+  ],
+  "relationships": [
+    { "type": "SUPPLIES",     "from": "Supplier",        "to": "Material",        "meaning": "This supplier provides this material",                 "source_table": "EKKO/EKPO" },
+    { "type": "USED_AT",      "from": "Material",        "to": "Plant",           "meaning": "This material is stocked/consumed at this plant",       "source_table": "MARC" },
+    { "type": "REQUIRED_FOR", "from": "Material",        "to": "ProductionOrder", "meaning": "This material is a component of this production order",  "source_table": "RESB" },
+    { "type": "RUNS_AT",      "from": "ProductionOrder", "to": "Plant",           "meaning": "This production order runs at this plant",              "source_table": "AFKO" },
+    { "type": "FULFILLS",     "from": "ProductionOrder", "to": "Delivery",        "meaning": "This production order's output goes into this delivery","source_table": "LIPS" }
+  ]
+}

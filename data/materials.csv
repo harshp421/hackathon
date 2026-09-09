@@ -1,0 +1,16 @@
+material_id,description,material_type,base_unit,procurement_type,primary_supplier_id,source_table
+M-1001,Hex Bolt M12x60 Class 10.9,ROH,PC,F,100234,MARA
+M-1002,Hex Nut M12 Class 10,ROH,PC,F,100234,MARA
+M-1003,Flat Washer M12 DIN125,ROH,PC,F,100234,MARA
+M-1004,Socket Head Cap Screw M8x40,ROH,PC,F,100234,MARA
+M-1005,Threaded Rod M10x1000,ROH,PC,F,100234,MARA
+M-2001,Cold-Rolled Steel Coil 1.5mm,ROH,KG,F,100567,MARA
+M-2002,Hot-Rolled Steel Plate 6mm,ROH,KG,F,100567,MARA
+M-2003,Stainless Steel Round Bar 20mm,ROH,M,F,100567,MARA
+M-3001,Ductile Iron Casting Gearbox Housing,ROH,PC,F,100812,MARA
+M-3002,Aluminium Die Casting Pump Body,ROH,PC,F,100812,MARA
+M-4001,Polyamide PA66 Granulate,ROH,KG,F,101245,MARA
+M-4002,POM Acetal Granulate,ROH,KG,F,101245,MARA
+M-5001,Deep Groove Ball Bearing 6205-2RS,ROH,PC,F,101876,MARA
+M-5002,Tapered Roller Bearing 30206,ROH,PC,F,101876,MARA
+M-6001,Epoxy Powder Coating RAL7016,ROH,KG,F,102455,MARA
