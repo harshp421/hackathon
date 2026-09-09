@@ -233,3 +233,8 @@ def generate_answer(evidence: Union[EvidenceContract, Dict[str, Any]]) -> str:
     return _template_contract_answer(evidence)
 
 
+# Alias for intuitive interface naming
+generate_explanation = generate_answer
+
+
+
