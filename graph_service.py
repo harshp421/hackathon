@@ -21,6 +21,56 @@ def _clean_list(items: Optional[List[Any]]) -> List[Any]:
     return [x for x in (items or []) if x is not None]
 
 
+def _get_config_val(key: str, section: Optional[str] = None, default: Optional[str] = None) -> Optional[str]:
+    """Retrieve config from streamlit secrets if available, falling back to os.environ."""
+    try:
+        import streamlit as st
+        # Check [section][key] first if section is provided
+        if section and section in st.secrets and key in st.secrets[section]:
+            return str(st.secrets[section][key])
+        # Check [key] directly in st.secrets
+        if key in st.secrets:
+            return str(st.secrets[key])
+        if key.upper() in st.secrets:
+            return str(st.secrets[key.upper()])
+    except Exception:
+        pass
+
+    # Map section + key to standard env variable names
+    if section == "neo4j":
+        if key.lower() in ("uri", "neo4j_uri"):
+            val = os.environ.get("NEO4J_URI")
+            if val: return val
+        elif key.lower() in ("user", "username", "neo4j_user"):
+            val = os.environ.get("NEO4J_USER")
+            if val: return val
+        elif key.lower() in ("password", "pwd", "neo4j_password"):
+            val = os.environ.get("NEO4J_PASSWORD")
+            if val: return val
+
+    env_val = os.environ.get(key.upper()) or os.environ.get(key)
+    return env_val if env_val is not None else default
+
+
+
+def _create_driver(uri: str, user: str, pwd: str) -> Driver:
+    """Internal driver factory."""
+    driver = GraphDatabase.driver(uri, auth=(user, pwd))
+    driver.verify_connectivity()
+    return driver
+
+
+# Attempt to wrap with @st.cache_resource if streamlit is running
+try:
+    import streamlit as st
+    @st.cache_resource(show_spinner=False)
+    def _get_cached_driver(uri: str, user: str, pwd: str) -> Driver:
+        return _create_driver(uri, user, pwd)
+except Exception:
+    def _get_cached_driver(uri: str, user: str, pwd: str) -> Driver:
+        return _create_driver(uri, user, pwd)
+
+
 class GraphService:
     _instance: Optional["GraphService"] = None
 
@@ -28,13 +78,14 @@ class GraphService:
         if driver:
             self.driver = driver
         else:
-            uri = os.environ.get("NEO4J_URI")
-            pwd = os.environ.get("NEO4J_PASSWORD")
-            user = os.environ.get("NEO4J_USER", "neo4j")
+            uri = _get_config_val("uri", section="neo4j") or _get_config_val("NEO4J_URI")
+            pwd = _get_config_val("password", section="neo4j") or _get_config_val("NEO4J_PASSWORD")
+            user = _get_config_val("username", section="neo4j") or _get_config_val("NEO4J_USER", default="neo4j")
             if not uri or not pwd:
-                raise ValueError("Neo4j credentials missing in environment.")
-            self.driver = GraphDatabase.driver(uri, auth=(user, pwd))
-            self.driver.verify_connectivity()
+                raise ValueError(
+                    "Neo4j credentials missing. Set NEO4J_URI and NEO4J_PASSWORD in .env or .streamlit/secrets.toml"
+                )
+            self.driver = _get_cached_driver(uri, user, pwd)
 
     @classmethod
     def get_instance(cls, driver: Optional[Driver] = None) -> "GraphService":

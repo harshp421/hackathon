@@ -15,13 +15,30 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-_AZ_ENDPOINT = (os.environ.get("AZURE_OPENAI_ENDPOINT") or "").strip()
-_AZ_KEY = (os.environ.get("AZURE_OPENAI_API_KEY") or "").strip()
-_AZ_DEPLOYMENT = (os.environ.get("AZURE_OPENAI_DEPLOYMENT") or "gpt-4o").strip()
-_AZ_API_VERSION = (os.environ.get("AZURE_OPENAI_API_VERSION") or "preview").strip()
+def _get_llm_config(key: str, default: str = "") -> str:
+    """Read from st.secrets if available, else os.environ."""
+    try:
+        import streamlit as st
+        # check [llm][key]
+        if "llm" in st.secrets and key.lower() in st.secrets["llm"]:
+            return str(st.secrets["llm"][key.lower()]).strip()
+        # check direct key
+        if key in st.secrets:
+            return str(st.secrets[key]).strip()
+        if key.upper() in st.secrets:
+            return str(st.secrets[key.upper()]).strip()
+    except Exception:
+        pass
+    return (os.environ.get(key.upper()) or os.environ.get(key) or default).strip()
 
-_OA_KEY = (os.environ.get("OPENAI_API_KEY") or "").strip()
-_OA_MODEL = (os.environ.get("OPENAI_MODEL") or "gpt-4o").strip()
+
+_AZ_ENDPOINT = _get_llm_config("AZURE_OPENAI_ENDPOINT")
+_AZ_KEY = _get_llm_config("AZURE_OPENAI_API_KEY")
+_AZ_DEPLOYMENT = _get_llm_config("AZURE_OPENAI_DEPLOYMENT", default="gpt-4o")
+_AZ_API_VERSION = _get_llm_config("AZURE_OPENAI_API_VERSION", default="preview")
+
+_OA_KEY = _get_llm_config("OPENAI_API_KEY") or _get_llm_config("api_key")
+_OA_MODEL = _get_llm_config("OPENAI_MODEL", default="gpt-4o")
 
 
 def _use_azure():

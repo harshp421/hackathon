@@ -35,3 +35,25 @@ class AgentOrchestrator:
             # Fallback to dynamic traversal agent so no query is ever rejected
             agent = self.dynamic_agent
         return agent.run(params)
+
+    def run(self, question: str) -> Dict[str, Any]:
+        """High-level runner: takes a raw user query string, routes, executes, and explains."""
+        from extract_params import extract_params
+        from explain import generate_explanation
+
+        # 1. Semantic Router
+        params = extract_params(question)
+
+        # 2. Domain Agent Execution
+        evidence = self.execute(params)
+
+        # 3. Grounded Explanation Generation
+        explanation = generate_explanation(evidence)
+
+        return {
+            "params": params,
+            "evidence": evidence,
+            "answer": explanation,
+            "contract": evidence.model_dump(),
+        }
+
