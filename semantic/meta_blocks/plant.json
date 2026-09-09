@@ -1,0 +1,18 @@
+{
+  "entity": "Plant",
+  "version": "1.0.0",
+  "identity": { "key": "id", "label": "Plant" },
+  "sap": { "source_tables": ["T001W"], "primary_field": "WERKS" },
+  "properties": ["id", "name", "country", "source_table"],
+  "relationships": {
+    "incoming": ["RUNS_AT", "USED_AT"],
+    "outgoing": []
+  },
+  "metrics": ["affected_production_orders", "affected_deliveries", "affected_quantity", "revenue_exposure"],
+  "contexts": ["plant_blocker", "plant_delay", "plant_capacity_issue"],
+  "agent": {
+    "primary": "PlantImpactAgent",
+    "secondary": ["DeliveryRootCauseAgent"]
+  },
+  "security": { "classification": "internal" }
+}

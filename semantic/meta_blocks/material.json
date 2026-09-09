@@ -1,0 +1,18 @@
+{
+  "entity": "Material",
+  "version": "1.0.0",
+  "identity": { "key": "id", "label": "Material" },
+  "sap": { "source_tables": ["MARA", "MARC"], "primary_field": "MATNR" },
+  "properties": ["id", "description", "material_type", "base_unit", "procurement_type", "primary_supplier_id", "source_table"],
+  "relationships": {
+    "incoming": ["SUPPLIES"],
+    "outgoing": ["USED_AT", "REQUIRED_FOR"]
+  },
+  "metrics": ["production_dependency", "inventory_exposure", "affected_production_orders"],
+  "contexts": ["material_shortage"],
+  "agent": {
+    "primary": "MaterialRiskAgent",
+    "secondary": ["MitigationAgent"]
+  },
+  "security": { "classification": "internal" }
+}

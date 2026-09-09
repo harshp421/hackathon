@@ -1,0 +1,18 @@
+{
+  "entity": "Delivery",
+  "version": "1.0.0",
+  "identity": { "key": "id", "label": "Delivery" },
+  "sap": { "source_tables": ["LIKP", "LIPS"], "primary_field": "VBELN" },
+  "properties": ["id", "customer_id", "customer_name", "product_id", "ref_order", "quantity", "ship_date", "incoterms", "source_table"],
+  "relationships": {
+    "incoming": ["FULFILLS"],
+    "outgoing": []
+  },
+  "metrics": ["likely_root_causes", "upstream_suppliers", "days_at_risk", "revenue_exposure"],
+  "contexts": ["delivery_delay_source"],
+  "agent": {
+    "primary": "DeliveryRootCauseAgent",
+    "secondary": ["MitigationAgent"]
+  },
+  "security": { "classification": "internal" }
+}
