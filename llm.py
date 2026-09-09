@@ -19,51 +19,79 @@ def _get_llm_config(key: str, default: str = "") -> str:
     """Read from st.secrets if available, else os.environ."""
     try:
         import streamlit as st
+        # check [azure][key]
+        if "azure" in st.secrets and key.lower() in st.secrets["azure"]:
+            return str(st.secrets["azure"][key.lower()]).strip()
         # check [llm][key]
         if "llm" in st.secrets and key.lower() in st.secrets["llm"]:
             return str(st.secrets["llm"][key.lower()]).strip()
-        # check direct key
+        # check direct key in st.secrets
         if key in st.secrets:
             return str(st.secrets[key]).strip()
         if key.upper() in st.secrets:
             return str(st.secrets[key.upper()]).strip()
+        if key.lower() in st.secrets:
+            return str(st.secrets[key.lower()]).strip()
     except Exception:
         pass
     return (os.environ.get(key.upper()) or os.environ.get(key) or default).strip()
 
 
-_AZ_ENDPOINT = _get_llm_config("AZURE_OPENAI_ENDPOINT")
-_AZ_KEY = _get_llm_config("AZURE_OPENAI_API_KEY")
-_AZ_DEPLOYMENT = _get_llm_config("AZURE_OPENAI_DEPLOYMENT", default="gpt-4o")
-_AZ_API_VERSION = _get_llm_config("AZURE_OPENAI_API_VERSION", default="preview")
+def get_azure_endpoint() -> str:
+    return _get_llm_config("AZURE_OPENAI_ENDPOINT")
 
-_OA_KEY = _get_llm_config("OPENAI_API_KEY") or _get_llm_config("api_key")
-_OA_MODEL = _get_llm_config("OPENAI_MODEL", default="gpt-4o")
+
+def get_azure_key() -> str:
+    return _get_llm_config("AZURE_OPENAI_API_KEY")
+
+
+def get_azure_deployment() -> str:
+    return _get_llm_config("AZURE_OPENAI_DEPLOYMENT", default="gpt-4o")
+
+
+def get_azure_api_version() -> str:
+    return _get_llm_config("AZURE_OPENAI_API_VERSION", default="2025-01-01-preview")
+
+
+def get_openai_key() -> str:
+    return _get_llm_config("OPENAI_API_KEY") or _get_llm_config("api_key")
+
+
+def get_openai_model() -> str:
+    return _get_llm_config("OPENAI_MODEL", default="gpt-4o")
 
 
 def _use_azure():
-    return bool(_AZ_ENDPOINT and _AZ_KEY)
+    return bool(get_azure_endpoint() and get_azure_key())
 
 
 def _openai_key_ok():
-    return len(_OA_KEY) > 20 and not _OA_KEY.startswith("sk-...")
+    oa_key = get_openai_key()
+    return len(oa_key) > 20 and not oa_key.startswith("sk-...")
 
 
 def available():
     return _use_azure() or _openai_key_ok()
 
 
-# model / deployment name passed on every call
-MODEL = _AZ_DEPLOYMENT if _use_azure() else _OA_MODEL
+class _ModelProxy:
+    def __str__(self):
+        return get_azure_deployment() if _use_azure() else get_openai_model()
+    def __repr__(self):
+        return self.__str__()
+
+
+MODEL = _ModelProxy()
 
 
 def _azure_base_url():
     """Normalise whatever endpoint form was given down to '.../openai/v1/'."""
-    raw = _AZ_ENDPOINT
+    raw = get_azure_endpoint()
     i = raw.find("/openai/v1")
     if i != -1:
         return raw[:i] + "/openai/v1/"
     return raw.rstrip("/") + "/openai/v1/"
+
 
 
 _client = None
@@ -78,10 +106,11 @@ def _get_client():
     if _use_azure():
         # The Azure "/openai/v1/" surface rejects the api-version query param;
         # only the older /openai/deployments/... path uses it.
-        _client = OpenAI(base_url=_azure_base_url(), api_key=_AZ_KEY, timeout=12.0)
+        _client = OpenAI(base_url=_azure_base_url(), api_key=get_azure_key(), timeout=12.0)
     else:
-        _client = OpenAI(api_key=_OA_KEY or None, timeout=12.0)
+        _client = OpenAI(api_key=get_openai_key() or None, timeout=12.0)
     return _client
+
 
 
 def chat_json(system, user, max_tokens=300):
